@@ -17,7 +17,11 @@ void setup()
   Serial.begin(9600);    //115200 si on veut
   Serial.println("Bonjour - Pret pour les commandes AT");
 
-  animation.add(&Animation::inorder, 4, 20);
+  animation.add(Anim(&Animation::inorder, 4.0, 6));
+  animation.add(Anim(&Animation::random, 4.0, 60));
+  animation.add(Anim(&Animation::rain, 4.0, 60));
+  animation.add(Anim(&Animation::serpentine, 4.0, 6));
+
 }
 
 

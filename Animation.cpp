@@ -4,20 +4,16 @@ Animation::Animation(ShiftRegister74HC595 &_sr) {
   sr = &_sr;
 }
 
-void Animations::add(AnimFunc fp, int arg1, int arg2) {
-  Vector<int> action;
-  action.push_back((int)&fp);
-  action.push_back(arg1);
-  action.push_back(arg2);
-  actions.push_back(action);
+void Animations::add(Anim a) {
+  actions.push_back(a);
 }
 
 void Animations::runAll() {
   for(int i=0; i < actions.size(); i++) {
-    auto fp = actions[i][0];
-    auto arg1 = actions[i][1];
-    auto arg2 = actions[i][2];
-    (*this.*((AnimFunc&)fp))(arg1, arg2);
+    auto fp = actions[i].anim;
+    auto arg1 = actions[i].aniSpeed;
+    auto arg2 = actions[i].count;
+    (this->*fp)(arg1, arg2);
   }
 }
 

@@ -13,7 +13,6 @@ public:
     void rain(float aniSpeed, int count);
     void serpentine(float aniSpeed, int count);
 private:
-    Vector<Vector<int>> actions;
     ShiftRegister74HC595 *sr;
     int lednb[3][3][3] = { { {4, 25, 5}, // Should be declared elsewhere, use a macro maybe?
                              {1, 6, 0},
@@ -26,15 +25,23 @@ private:
                              {17, 20, 21} } };
 };
 
+typedef void (Animation::* AnimFunc)(float, int);
+
+struct Anim {
+  AnimFunc anim;
+  float aniSpeed;
+  int count;
+  Anim(AnimFunc anim, float aniSpeed, int count): anim(anim), aniSpeed(aniSpeed), count(count) {};
+};
+
 class Animations: Animation
 {
-  typedef decltype(&Animation::random) AnimFunc;
   public:
-      Animations(ShiftRegister74HC595 &_sr): Animation(_sr) {};
-      void add(AnimFunc fp, int arg1, int arg2);
+      Animations(ShiftRegister74HC595 &_sr): Animation(_sr), miaou(&Animation::inorder) {};
+      void add(Anim a);
       void runAll();
   private:
-      Vector<Vector<int>> actions;
+      Vector< Anim > actions;
 };
 
 #endif
