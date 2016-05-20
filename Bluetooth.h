@@ -8,4 +8,4 @@
 
 void setupBluetooth();
 
-void updateBluetooth();
+int getAnimBluetooth();

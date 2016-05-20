@@ -2,7 +2,7 @@
 #include "Animation.h"
 #include <ShiftRegister74HC595.h>
 
-#define REGISTERS_COUNT 3
+#define REGISTERS_COUNT 4
 #define PIN_LATCH 8 
 #define PIN_DATA 11
 #define PIN_CLOCK 12
@@ -12,72 +12,57 @@ Animations animation(sr);
 
 void setup()
 {
-//  setupBluetooth();
+  pinMode(13, OUTPUT); // Arduino's embedded LED
+  Serial.begin(9600);    // or 115200 
+  
+  setupBluetooth(); // Initialize Bluetooth module
 
-  Serial.begin(9600);    //115200 si on veut
-  Serial.println("Bonjour - Pret pour les commandes AT");
+  noInterrupts();           // disable all interrupts
+  // initialize timer1 (16bit) in CTC mode — see http://www.locoduino.org/spip.php?article89
+  TCCR1A = 0;
+  TCCR1B = 0b00001100; // tweak divider, currently 256
+  TIMSK1 = 0b00000010;
+  TCNT1 = 0;
+  OCR1A = 31250; // tweak time
+
+  // Pin change interrupt - doesn't work with SoftwareSerial
+  //PCICR = 0b00000100;          // Enable PCINT1 interrupt
+  //PCMSK2 = bit (digitalPinToPCMSKbit(BTRX)); // enable only for BTRX pin — see http://playground.arduino.cc/Main/PinChangeInterrupt
+  interrupts();             // enable all interrupts
 
   animation.add(Anim(&Animation::inorder, 4.0, 6));
   animation.add(Anim(&Animation::random, 4.0, 60));
   animation.add(Anim(&Animation::rain, 4.0, 60));
   animation.add(Anim(&Animation::serpentine, 4.0, 6));
-
 }
 
+// Interrupt for bluetooth update and accelerometer sampling
+ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
+{
+  digitalWrite(13, digitalRead(13) ^ 1);   // toggle LED pin
 
+  int a = getAnimBluetooth(); // update bluetooth
+  if(a < 0) return;
+  animation.setBreak(true); // stop currently running animation
+  animation.clear(); // remove current list of animation
+
+  switch(a) { // add animation corresponding to the received number
+    case 1:
+          animation.add(Anim(&Animation::inorder, 4.0, 6));
+          break;
+    case 2:
+          animation.add(Anim(&Animation::random, 4.0, 60));
+          break;
+    case 3: 
+          animation.add(Anim(&Animation::rain, 4.0, 60));
+          break;
+    case 4:
+          animation.add(Anim(&Animation::serpentine, 4.0, 6));
+          break;
+  }
+}
 
 void loop()
 {
-  animation.runAll();
-
-
-/*  updateBluetooth();
-
-  animation.inorder(4, 20);
-  animation.random(4, 20);
-  animation.rain(4, 20);
-  animation.serpentine(4, 20);
-  
-
-    auto func = [] () { Serial.println("Hello world"); };
-    func(); // now call the function
-
-    auto fp = &Animation::serpentine;
-
-    Vector<int> fs;
-    fs.push_back((int)&fp);
-    fs.push_back(4);
-    fs.push_back(20);
-    Vector<Vector<int>> v;
-    v.push_back(fs);
-
-    auto miaou = v[0];
-    auto nyan = miaou[1];
-    auto meow = miaou[2];
-    Serial.print(((int)*(AnimFunc*)miaou[0]);
-    Serial.print(nyan);
-    Serial.print(" ");
-    Serial.println(meow);
-
-(animation.**((AnimFunc*)miaou[0]))(nyan, meow);
-    
-    void (Animation::*)(float, int)
-    
-*/
-    
-/*
-  if(recvChar == 'C') 
-  {
-    digitalWrite(LED, LOW);   // turn the LED on (HIGH is the voltage level)
-  }
-  if(recvChar == 'c')
-  {
-    digitalWrite(LED, HIGH);    // turn the LED off by making the voltage LO
-  }
-*/
-
-/*  BTSerie.write("*D");
-  BTSerie.print(sonar.ping_cm());
-  BTSerie.write("*");
-  */
+  animation.runNext();
 }

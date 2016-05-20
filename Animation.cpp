@@ -5,18 +5,32 @@ Animation::Animation(ShiftRegister74HC595 &_sr) {
 }
 
 void Animations::add(Anim a) {
-  actions.push_back(a);
+  actions->push_back(a);
 }
 
-void Animations::runAll() {
-  for(int i=0; i < actions.size(); i++) {
-    auto fp = actions[i].anim;
-    auto arg1 = actions[i].aniSpeed;
-    auto arg2 = actions[i].count;
-    (this->*fp)(arg1, arg2);
-  }
+void Animations::clear() {
+  delete actions;
+  actions = new Vector<Anim>;
 }
 
+void Animations::setBreak(bool v) {
+  needBreak = v;
+}
+
+void Animations::runNext() {
+  setBreak(false);
+  if(curAnim >= actions->size()) curAnim = 0;
+  auto fp = (*actions)[curAnim].anim;
+  auto arg1 = (*actions)[curAnim].aniSpeed;
+  auto arg2 = (*actions)[curAnim].count;
+  (this->*fp)(arg1, arg2);
+  curAnim++;
+}
+
+bool Animation::forceBreak() {
+  if(needBreak) sr->setAllHigh();
+  return needBreak;
+}
 void Animation::inorder(float aniSpeed, int count) {
   sr->setAllHigh();
   int d = 1000/aniSpeed;
@@ -24,6 +38,7 @@ void Animation::inorder(float aniSpeed, int count) {
     for(int z = 0; z < 3; z++) {
       for(int l = 0; l < 3; l++) {
         for(int c = 0; c < 3; c++) {
+          if(forceBreak()) return;
           sr->set(lednb[z][l][c], LOW);
           delay(d);
         }
@@ -37,6 +52,7 @@ void Animation::random(float aniSpeed, int count) {
   sr->setAllHigh();
   int d = 1000/aniSpeed;
   for(int i = 0; i < count; i++) {
+    if(forceBreak()) return;
     int h = ::random(0,3);
     int l = ::random(0,3);
     int c = ::random(0,3);
@@ -54,6 +70,7 @@ void Animation::rain(float aniSpeed, int count) {
     int l = ::random(0,3);
     int c = ::random(0,3);
     for(int h = 2; h >= 0; h--) {
+      if(forceBreak()) return;
       int led = lednb[h][l][c];
       sr->set(led, LOW);
       delay(d);
@@ -71,6 +88,7 @@ void Animation::serpentine(float aniSpeed, int count) {
     for(int h = 2; h >= 0; h--) {
       for(int l = 0; l < 4; l++) {
         for(int c = 0; c < 3; c++) {
+          if(forceBreak()) return;
           if((l == 1 && c != 2) || (l == 3 && c != 0)) continue;
           int led = lednb[h][l == 3 ? 1 : l][l == 2 ? 2-c : c];
           sr->set(led, LOW);
@@ -79,6 +97,7 @@ void Animation::serpentine(float aniSpeed, int count) {
       }
     }
     for(int h = 0; h < 3; h++) { // Center LEDs
+      if(forceBreak()) return;
       sr->set(lednb[h][1][1], LOW);
       delay(d);
     }
