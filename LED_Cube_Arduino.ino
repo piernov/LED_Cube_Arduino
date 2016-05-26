@@ -1,5 +1,6 @@
 #include "Bluetooth.h"
 #include "Animation.h"
+#include "Accelerometer.h"
 #include <ShiftRegister74HC595.h>
 
 #define REGISTERS_COUNT 4
@@ -9,13 +10,14 @@
 
 ShiftRegister74HC595 sr(REGISTERS_COUNT, PIN_DATA, PIN_CLOCK, PIN_LATCH);
 Animations animation(sr);
+Bluetooth bluetooth;
 
 void setup()
 {
   pinMode(13, OUTPUT); // Arduino's embedded LED
   Serial.begin(9600);    // or 115200 
   
-  setupBluetooth(); // Initialize Bluetooth module
+  bluetooth.init(); // Initialize Bluetooth module
 
   noInterrupts();           // disable all interrupts
   // initialize timer1 (16bit) in CTC mode — see http://www.locoduino.org/spip.php?article89
@@ -29,11 +31,6 @@ void setup()
   //PCICR = 0b00000100;          // Enable PCINT1 interrupt
   //PCMSK2 = bit (digitalPinToPCMSKbit(BTRX)); // enable only for BTRX pin — see http://playground.arduino.cc/Main/PinChangeInterrupt
   interrupts();             // enable all interrupts
-
-  animation.add(Anim(&Animation::inorder, 4.0, 6));
-  animation.add(Anim(&Animation::random, 4.0, 60));
-  animation.add(Anim(&Animation::rain, 4.0, 60));
-  animation.add(Anim(&Animation::serpentine, 4.0, 6));
 }
 
 // Interrupt for bluetooth update and accelerometer sampling
@@ -41,25 +38,12 @@ ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
 {
   digitalWrite(13, digitalRead(13) ^ 1);   // toggle LED pin
 
-  int a = getAnimBluetooth(); // update bluetooth
-  if(a < 0) return;
-  animation.setBreak(true); // stop currently running animation
-  animation.clear(); // remove current list of animation
-
-  switch(a) { // add animation corresponding to the received number
-    case 1:
-          animation.add(Anim(&Animation::inorder, 4.0, 6));
-          break;
-    case 2:
-          animation.add(Anim(&Animation::random, 4.0, 60));
-          break;
-    case 3: 
-          animation.add(Anim(&Animation::rain, 4.0, 60));
-          break;
-    case 4:
-          animation.add(Anim(&Animation::serpentine, 4.0, 6));
-          break;
+  if(updateAccelerometer()) {
+    animation.forceAnimById(5, 1, 10);
   }
+
+  if(bluetooth.update()) // update bluetooth
+    animation.forceAnimById(bluetooth.getAnim(), bluetooth.getAnimSpeed(), bluetooth.getDuration());
 }
 
 void loop()

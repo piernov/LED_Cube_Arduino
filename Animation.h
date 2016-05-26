@@ -2,7 +2,8 @@
 #define Animation_h
 
 #include <ShiftRegister74HC595.h>
-#include <Vector.h>
+
+extern int face;
 
 class Animation
 {
@@ -13,8 +14,17 @@ public:
     void random(float aniSpeed, int count);
     void rain(float aniSpeed, int count);
     void serpentine(float aniSpeed, int count);
+    void lightface(float aniSpeed, int count);
+    typedef void (Animation::* AnimFunc)(float, int);
 protected:
     bool needBreak = false;
+    AnimFunc anim[5] = {
+      &Animation::inorder,
+      &Animation::random,
+      &Animation::rain,
+      &Animation::serpentine,
+      &Animation::lightface
+    };
 private:
     ShiftRegister74HC595 *sr;
     int lednb[3][3][3] = { { {4, 28, 5}, // Should be declared elsewhere, use a macro maybe?
@@ -30,28 +40,29 @@ private:
     bool forceBreak();
 };
 
-typedef void (Animation::* AnimFunc)(float, int);
-
 struct Anim { // Stores an animation function with its parameters
-  AnimFunc anim;
+  Animation::AnimFunc anim;
   float aniSpeed;
   int count;
-  Anim(AnimFunc anim, float aniSpeed, int count): anim(anim), aniSpeed(aniSpeed), count(count) {};
+  Anim(Animation::AnimFunc anim, float aniSpeed, int count): anim(anim), aniSpeed(aniSpeed), count(count) {};
+  Anim() {};
 };
 
 class Animations: Animation
 {
   public:
-      Animations(ShiftRegister74HC595 &_sr): Animation(_sr) {
-        actions = new Vector<Anim>;
-      };
+      Animations(ShiftRegister74HC595 &_sr);
       void add(Anim a);
       void clear();
+      void load();
       void runNext();
       void setBreak(bool v);
+      void forceAnimById(int anim, float aniSpeed, int count);
+      AnimFunc getAnimById(int n);
   private:
       int curAnim = 0;
-      Vector<Anim> *actions;
+      Anim actions[16]; // max 16 chained actions
+      int actCount = 0;
 };
 
 #endif

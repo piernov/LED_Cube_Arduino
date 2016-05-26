@@ -1,44 +1,53 @@
 #include "Bluetooth.h"
+#include <Arduino.h>
 
-SoftwareSerial BTSerie(BTRX, BTTX);
+Bluetooth::Bluetooth() : ss(BTRX, BTTX) {
+  anim = 0;
+  animSpeed = 4.0;
+  duration = 15;
+};
 
-//void callback() {
-//  Serial.println("Bluetooth Callback");
-//  updateBluetooth();
-//}
-
-void setupBluetooth() {
-    // Configuration du bluetooth
+void Bluetooth::init() {
   pinMode(BTRX, INPUT);
   pinMode(BTTX, OUTPUT);
-  
-  BTSerie.begin(9600);  //57600
-//  BTSerie.setInterruptCallback(&callback);
+
+  ss.begin(9600);  //57600
+  ss.print("AT");  // Starts communication
   delay(500);
-  BTSerie.print("AT");  // Starts communication
-  delay(500);
-  BTSerie.print(BTNAME); // Set bluetooth module name
+  ss.print(BTNAME); // Set bluetooth module name
   Serial.println(BTNAME);
   delay(500);
-  BTSerie.print(BTPIN); // Set bluetooth module PIN code
+  ss.print(BTPIN); // Set bluetooth module PIN code
   Serial.println(BTPIN);
   delay(500);
 }
 
-// The following needs to be modified to handle selecting the animation along with its parameters
-int getAnimBluetooth() {
-  if(!BTSerie.available()) return -1;
-  char c = BTSerie.read();
-  if(c == 'A') {
-    String miaou =  BTSerie.readStringUntil('p');
-    return miaou.toInt();
+bool Bluetooth::update() {
+  if(!ss.available()) return false;
+  char c = ss.read();
+  if(c == 'A') // Anim number
+    anim =  ss.readStringUntil('p').toInt();
+  else if(c == 'S') // Anim speed
+    animSpeed = ss.readStringUntil('p').toFloat();
+  else if(c == 'D') // Anim duration
+    duration = ss.readStringUntil('p').toInt();
+  else if(c == 'U')
+  {
+    ss.read();
+    return true;
   }
-  else if(c == 'S') {
-    // add animation speed parameter handling here
-  }
-  else if(c == 'D') {
-    // add animation duration parameter handling here
-  }
-  return -1;
+  return false;
+}
+
+float Bluetooth::getAnimSpeed() {
+  return animSpeed;
+}
+
+int Bluetooth::getDuration() {
+  return duration;
+}
+
+int Bluetooth::getAnim() {
+  return anim;
 }
 
