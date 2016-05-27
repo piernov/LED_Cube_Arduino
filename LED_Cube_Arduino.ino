@@ -39,7 +39,7 @@ ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
   digitalWrite(13, digitalRead(13) ^ 1);   // toggle LED pin
 
   if(updateAccelerometer()) {
-    animation.forceAnimById(5, 1, 10);
+    animation.forceAnimById(5, 1, 6);
   }
 
   if(bluetooth.update()) // update bluetooth

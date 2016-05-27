@@ -1,6 +1,6 @@
 // max/min analog values
 #define MINAV 257
-#define MAXAV 387
+#define MAXAV 422
 
 // analog input pins
 #define X_PIN 0
@@ -10,17 +10,17 @@
 int face = 0;
 
 int getFace(int pitch, int roll) {
-  if(pitch <= 20 && pitch >= -20 && roll <= 20 && roll >= -20)
+  if(pitch <= 40 && pitch >= -40 && roll <= 40 && roll >= -40)
     return 1;
-  if(pitch <= 20 && pitch >= -20 && roll <= 110 && roll >= 70)
+  if(pitch <= 40 && pitch >= -40 && roll <= 130 && roll >= 50)
     return 2;
-  if(pitch <= 20 && pitch >= -20 && roll <= -70 && roll >= -110)
+  if(pitch <= 40 && pitch >= -40 && roll <= -50 && roll >= -130)
     return 3;
-  if(pitch <= -160 && pitch >= 160 && roll <= 20 && roll >= -20)
+  if(pitch <= -140 && pitch >= 140 && roll <= 40 && roll >= -40)
     return 4;
-  if(pitch <= 110 && pitch >= 70 && roll <= 20 && roll >= -20)
+  if(pitch <= 130 && pitch >= 50 && roll <= 40 && roll >= -40)
     return 5;
-  if(pitch <= -70 && pitch >= -110 && roll <= 20 && roll >= -20)
+  if(pitch <= -50 && pitch >= -130 && roll <= 40 && roll >= -40)
     return 6;
   else
     return 0;
@@ -48,11 +48,15 @@ bool updateAccelerometer() {
   if (roll > 180) {
     roll = roll - 360;
   }
+  Serial.println("miaou");
   Serial.println(pitch);
   Serial.println(roll);
+  Serial.println(x);
+  Serial.println(y);
+  Serial.println(z);
 
   int nface = getFace(pitch, roll);
-  if(face != nface) {
+  if(nface != 0 && face != nface) {
     Serial.println(nface);
     face = nface;
     return true;

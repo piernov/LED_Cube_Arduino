@@ -180,7 +180,7 @@ void Animation::serpentine(float aniSpeed, int count) {
   }
 }
 
-PROGMEM const int faces[6][9] = { {4, 28, 5, 1, 6, 0, 7, 3, 2},
+int faces[6][9] = { {4, 28, 5, 1, 6, 0, 7, 3, 2},
                     {19, 26, 18, 23, 22, 16, 17, 20, 21},
                     {4, 1, 7, 11, 12, 10, 19, 23, 17},
                     {5, 0, 2, 13, 15, 14, 18, 16, 21},
@@ -189,6 +189,7 @@ PROGMEM const int faces[6][9] = { {4, 28, 5, 1, 6, 0, 7, 3, 2},
 
 void Animation::lightface(float aniSpeed, int count) {
   if(face < 1 || face > 6) return;
+  debugAnim("serpentine", face, count);
   sr->setAllHigh();
   for(int i = 0; i < 9; i++)
   {
