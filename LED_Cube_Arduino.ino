@@ -2,6 +2,7 @@
 #include "Animation.h"
 #include "Accelerometer.h"
 #include <ShiftRegister74HC595.h>
+#include <NewPing.h>
 
 #define REGISTERS_COUNT 4
 #define PIN_LATCH 8 
@@ -11,10 +12,18 @@
 ShiftRegister74HC595 sr(REGISTERS_COUNT, PIN_DATA, PIN_CLOCK, PIN_LATCH);
 Animations animation(sr);
 Bluetooth bluetooth;
+//NewPing sonar(3,4,15); // trigger - echo - max dist
+
+#define PIN_TRIGGER 3
+#define PIN_ECHO 4
+
+bool triggered = false;
 
 void setup()
 {
   pinMode(13, OUTPUT); // Arduino's embedded LED
+  pinMode(PIN_TRIGGER, OUTPUT);
+  pinMode(PIN_ECHO, INPUT);
   Serial.begin(9600);    // or 115200 
   
   bluetooth.init(); // Initialize Bluetooth module
@@ -44,6 +53,23 @@ ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
 
   if(bluetooth.update()) // update bluetooth
     animation.forceAnimById(bluetooth.getAnim(), bluetooth.getAnimSpeed(), bluetooth.getDuration());
+
+  digitalWrite(PIN_TRIGGER, HIGH);
+  delayMicroseconds(100);
+  digitalWrite(PIN_TRIGGER, LOW);
+
+//  int pingcm = sonar.ping_cm();
+  int pingcm = pulseIn(PIN_ECHO, HIGH, 1600);
+  Serial.print("Dist: ");
+  Serial.println(pingcm);
+  if(pingcm > 0) {
+    if( !triggered ) {
+       triggered = true;
+      animation.forceAnimById(6, 1, 60);
+    }
+  } else {
+    triggered = false;
+  }
 }
 
 void loop()

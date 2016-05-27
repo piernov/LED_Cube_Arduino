@@ -15,15 +15,17 @@ public:
     void rain(float aniSpeed, int count);
     void serpentine(float aniSpeed, int count);
     void lightface(float aniSpeed, int count);
+    void lightall(float aniSpeed, int count);
     typedef void (Animation::* AnimFunc)(float, int);
 protected:
     bool needBreak = false;
-    AnimFunc anim[5] = {
+    AnimFunc anim[6] = {
       &Animation::inorder,
       &Animation::random,
       &Animation::rain,
       &Animation::serpentine,
-      &Animation::lightface
+      &Animation::lightface,
+      &Animation::lightall
     };
 private:
     ShiftRegister74HC595 *sr;

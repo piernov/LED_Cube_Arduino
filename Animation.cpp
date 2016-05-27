@@ -5,7 +5,7 @@ Animation::Animation(ShiftRegister74HC595 &_sr) {
 }
 
 Animation::AnimFunc Animations::getAnimById(int n) {
-  if(n < 5) return anim[n];
+  if(n < 6) return anim[n];
   else return anim[0];
 }
 
@@ -189,7 +189,7 @@ int faces[6][9] = { {4, 28, 5, 1, 6, 0, 7, 3, 2},
 
 void Animation::lightface(float aniSpeed, int count) {
   if(face < 1 || face > 6) return;
-  debugAnim("serpentine", face, count);
+  debugAnim("lightface", face, count);
   sr->setAllHigh();
   for(int i = 0; i < 9; i++)
   {
@@ -202,4 +202,19 @@ void Animation::lightface(float aniSpeed, int count) {
   sr->setAllHigh();
 }
 
+extern bool triggered;
+void Animation::lightall(float aniSpeed, int count) {
+  if(!triggered) return;
+  debugAnim("lightall", face, count);
+  sr->setAllLow();
+  for(int i = 0; i < count*10; i++) { // just wait
+    if(forceBreak() || !triggered) { 
+      triggered = false;
+      return;
+    }
+    delay(100);
+  }
+  sr->setAllHigh();
+  triggered = false;
+}
 
