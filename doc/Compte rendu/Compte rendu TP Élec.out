@@ -1,0 +1,20 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Fonctionnalités}{}% 2
+\BOOKMARK [1][-]{section.3}{Montage}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Matériel}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Schéma fonctionnel}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Branchements}{section.3}% 6
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Cube de LED}{subsection.3.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.3.2}{Registres à décalage}{subsection.3.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.3.3}{Module Bluetooth}{subsection.3.3}% 9
+\BOOKMARK [3][-]{subsubsection.3.3.4}{Accéléromètre}{subsection.3.3}% 10
+\BOOKMARK [3][-]{subsubsection.3.3.5}{Capteur de distance}{subsection.3.3}% 11
+\BOOKMARK [1][-]{section.4}{Programmation}{}% 12
+\BOOKMARK [2][-]{subsection.4.1}{Programmation par interruption}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.2}{Animations et contrôle des LEDs}{section.4}% 14
+\BOOKMARK [2][-]{subsection.4.3}{Bluetooth}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.4}{Accéléromètre}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.5}{Capteur de distance}{section.4}% 17
+\BOOKMARK [1][-]{section.5}{Difficultés rencontrées}{}% 18
+\BOOKMARK [1][-]{section.6}{Améliorations possibles}{}% 19
+\BOOKMARK [1][-]{section.7}{Ressources}{}% 20

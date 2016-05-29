@@ -1,0 +1,113 @@
+\documentclass{beamer}
+\usepackage{luatextra}
+\usepackage{polyglossia}
+\usepackage{ulem}
+\usepackage{framed}
+\usepackage{color}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\usepackage{hyperref}
+
+\usepackage{ifluatex}
+\ifluatex
+  \usepackage{pdftexcmds}
+  \makeatletter
+  \let\pdfstrcmp\pdf@strcmp
+  \let\pdffilemoddate\pdf@filemoddate
+  \makeatother
+\fi
+\usepackage{svg}
+
+%%\setmathfont{xits-math.otf}
+
+\setmainlanguage{french}
+\setmainfont{Latin Modern Roman}
+
+%%\geometry{margin={1in,1in}}
+
+\newcommand\image[2]{
+\directlua{
+local image = img.scan({filename = "#1"})
+
+image.height = image.height * #2
+image.width  = image.width  * #2
+
+node.write(img.node(image))
+}
+}
+
+\usetheme{Madrid}
+
+\title{Présentation projet TP électronique}
+\author{Julia OUZZINE - Pierre-Emmanuel NOVAC}
+
+%\institute{\image{polytechnice.png}{0.05}}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \maketitle
+\end{frame}
+
+%%\makeatletter
+\begin{frame}
+\frametitle{Cube de DELs}
+\image{Led_cube2.jpg}{0.8}
+  \tiny \textit{Source: Mitch Altman — CC-BY-SA — flickr.com}
+\end{frame}
+%%\makeatother
+
+
+\begin{frame}
+  \frametitle{Pourquoi?}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Fonctionnalités}
+  \begin{itemize}
+    \item Contrôle indépendant de 27 DELs
+    \item Différentes animations préprogrammées
+    \item Choix de l'animation à l'aide d'une application Android (transmission Bluetooth)
+    \item Détection de l'orientation et réaction en conséquence
+    \item Interaction avec l'environnement: capteur de contact (ou capteur sonore)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Composants utilisés}
+  \begin{itemize}
+    \item 1 microcontrôleur: Arduino
+    \item 27 DELs bleues
+    \item 2 Contrôleur de LED: TI TLC5940
+    \item 1 module bluetooth: HC-06
+    \item 1 accéléromètre: ADXL335
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Schéma fonctionnel}
+  \includesvg{block_diagram}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Consommation électrique — Alimentation}
+  \begin{itemize}
+    \item 27 DELs 20mA: $27\times 20 = 540mA$
+    \item Arduino: $\approx 50mA$
+    \item 2 TLC5940: $2\times 12 = 24mA$
+    \item HC-06: $8mA$
+    \item ADXL335: $0,35mA$
+  \end{itemize}
+    $\approx 652mA$\\
+      USB: 5V — 500mA max.
+\end{frame}
+
+
+\end{document}
+
+
+
+
+
